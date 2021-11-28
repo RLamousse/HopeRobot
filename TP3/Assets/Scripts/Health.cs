@@ -44,20 +44,22 @@ public class Health : MonoBehaviour
     {
         return getHeartTransform(heartsContainer.transform.childCount - 1);
     }
-
-    // public void LoseOneHeart() {
-    //     int remainingHearts = LevelManager.instance.nbLives;
-        
-    //     if(remainingHearts + 1>= 0)
-    //     {
-    //         getHeartTransform(remainingHearts + 1).GetComponent<Image>().sprite = emptyHeart;
-    //     }
-    // }
-
+    
     public void ResetHearts() {
         if (firstHeart == null) return;
 
+      
         if(LevelManager.instance.nbInitialLives == LevelManager.instance.nbLives) {
+            int childCount = heartsContainer.transform.childCount;
+            if (childCount > 1)
+            {
+                for (int i = 0; i < childCount; i++)
+                {
+                    getHeartTransform(i).GetComponent<Image>().sprite = filledHeart;
+                }
+            }
+            else
+            {
             for (int i = 1; i < LevelManager.instance.nbInitialLives; i++) {
                 Vector3 position = getLastHeart().transform.localPosition;
                 position.x -= getLastHeart().GetComponent<RectTransform>().rect.width + 10;
@@ -65,6 +67,8 @@ public class Health : MonoBehaviour
                 newHeart.transform.SetParent(heartsContainer.transform);
                 newHeart.transform.localScale = firstHeart.transform.localScale;
                 newHeart.transform.localPosition = position;
+            }
+        
             }
         }  
     }

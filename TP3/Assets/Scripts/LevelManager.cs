@@ -36,7 +36,6 @@ public class LevelManager : MonoBehaviour
             resetHealthBar();
             resetPowerUps();
         }
-        Debug.Log("couco");
     }
 
 
