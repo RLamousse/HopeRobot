@@ -7,8 +7,8 @@ public class RobotController : MonoBehaviour
 {
     // D�claration des constantes
     private static readonly Vector3 FlipRotation = new Vector3(0, 180, 0);
-    private static readonly Vector3 CameraPosition = new Vector3(1, 0.2f, 0);
-    private static readonly Vector3 InverseCameraPosition = new Vector3(-1, 0.2f, 0);
+    private static readonly Vector3 CameraPosition = new Vector3(0, 0, 0);
+    private static readonly Vector3 InverseCameraPosition = new Vector3(0, 0, 0);
 
     // D�claration des variables
     public bool isSpeedBoosted = false;
@@ -39,14 +39,16 @@ public class RobotController : MonoBehaviour
     [SerializeField]
     public bool hasShield = false;
 
-    
-
     [SerializeField]
     GameObject Shield;
 
     public static RobotController instance;
 
     private float baseGravity = -1.981f;
+
+    public float smoothCameraTransitionSpeed = 0.125f;
+    public Vector3 offset;
+    private float lastCameraYPosition = 0;
 
     // Awake se produit avait le Start. Il peut �tre bien de r�gler les r�f�rences dans cette section.
     void Awake()
@@ -84,6 +86,32 @@ public class RobotController : MonoBehaviour
         HorizontalMove(direction);
         CheckJump();
         CheckY();
+        
+    }
+
+    private void LateUpdate()
+    {
+        UpdateCamera();
+        CheckRolling();
+    }
+
+    void UpdateCamera()
+    {
+        float damping = 0.250f;
+        Vector3 currentPosition = _MainCamera.transform.position;
+        Vector3 targetPosition = _Anim.transform.position + offset;
+        Vector3 smoothedPosition = Vector3.Lerp(_MainCamera.transform.position, targetPosition, damping);
+        if (!_Grounded && (Math.Abs(lastCameraYPosition - targetPosition.y) < 30) && !AnimatorIsPlaying("anim_open"))
+        {
+            smoothedPosition.y = lastCameraYPosition;
+        }
+        else
+        {
+        _MainCamera.transform.LookAt(_Anim.transform);
+
+        }
+            _MainCamera.transform.position = new Vector3(targetPosition.x, smoothedPosition.y, smoothedPosition.z);
+            lastCameraYPosition = _MainCamera.transform.position.y;
     }
 
     void CheckStandby() {
@@ -139,12 +167,12 @@ public class RobotController : MonoBehaviour
             if (Input.GetKey(KeyCode.D))
 		    {
                 direction = 1; 
-                _Anim.SetBool("Walk_Anim", true);
+                if(_Grounded) _Anim.SetBool("Walk_Anim", true);
             }
             else if (Input.GetKey(KeyCode.A))
             {
                 direction = -1;
-                _Anim.SetBool("Walk_Anim", true);
+                if (_Grounded) _Anim.SetBool("Walk_Anim", true);
             } else 
             {
                 direction = 0;
@@ -152,30 +180,12 @@ public class RobotController : MonoBehaviour
             }
 
             if (direction == 0 && Input.GetKeyDown(KeyCode.LeftAlt)) {
-                if (isRolling)
-                {
-                    _Anim.SetBool("Roll_Anim", false);
-                    _Anim.SetBool("Walk_Anim", true);
-                    isRolling = false;
-                    ChangeSphereColliderToWalk();
-                }
-                else
-                {
-                    _Anim.SetBool("Roll_Anim", true);
-                    _Anim.SetBool("Walk_Anim", false);
-                    isRolling = true;
-                    ChangeSphereColliderToRoll();
-                }
+                bool isRolling = _Anim.GetBool("Roll_Anim");
+                if(isRolling) _Anim.SetBool("Roll_Anim", false);
+                else _Anim.SetBool("Roll_Anim", true);
             }
-
-            if( _Anim.GetBool("Roll_Anim") ) {
-                Speed = baseSpeed * 2;
-            } else {
-                Speed = baseSpeed;
-            }
+           
         }
-        
-        
         
 
         AdaptSpeedToSlopes();
@@ -183,25 +193,32 @@ public class RobotController : MonoBehaviour
         _Rb.AddForce(new Vector3(0, 0, direction * Speed), ForceMode.Acceleration);
     }
 
+    void CheckRolling()
+    {
+        bool goToRollPlaying = AnimatorIsPlaying("anim_open_GoToRoll");
+        if (_Anim.GetBool("Roll_Anim") && !goToRollPlaying)
+        {
+            isRolling = true;
+            ChangeSphereColliderToRoll();
+            Speed = baseSpeed * 2;
+        } else
+        {
+            isRolling = false;
+            ChangeSphereColliderToWalk();
+            Speed = baseSpeed;
+        }
+    }
+
     void AdaptSpeedToSlopes() {
         RaycastHit hit;
         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, Mathf.Infinity, LayerMask.GetMask("Floor")))
         {
-            // Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
-            // Debug.Log(hit.distance);
             Vector3 reflectVec = Vector3.Reflect(transform.TransformDirection(Vector3.forward), hit.normal);
             float angle = Vector3.Angle(reflectVec, transform.TransformDirection(Vector3.forward));
             if (180f-angle < 90f && hit.distance<0.5f) {
                 Speed = 0;
             }
-
-            //Debug.DrawRay(hit.point, reflectVec, Color.green);
         } 
-        // else
-        // {
-        //     Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 1000, Color.white);
-        //     Debug.Log("Did not Hit");
-        // }
     }
 
     // G�re le saut du personnage, ainsi que son animation de saut
@@ -237,6 +254,7 @@ public class RobotController : MonoBehaviour
     // G�re l'orientation du joueur et les ajustements de la camera
     void FlipCharacter(int direction)
     {
+        float initialYRotation = _MainCamera.transform.rotation.y;
         if (direction < 0 && !_Flipped)
         {
             _Flipped = true;
@@ -256,6 +274,10 @@ public class RobotController : MonoBehaviour
 // Collision avec le sol
 void OnCollisionEnter(Collision coll)
     {
+        if(coll.gameObject.tag == "Spaceship")
+        {
+            Debug.Log("Game won");
+        }
         HealthBar.instance.ApplyDamage(coll);
         // On s'assure de bien �tre en contact avec le sol
         if ((WhatIsGround & (1 << coll.gameObject.layer)) == 0)

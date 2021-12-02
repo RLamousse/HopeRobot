@@ -39,7 +39,12 @@ public class HealthBar : MonoBehaviour
                 damage = (float) coll.gameObject.GetComponent<ProjectileController>().collisionDamage;
             }
         }
-        
+
+        if (coll.gameObject.tag == "StoneMonster")
+        {
+            damage = 1.0f;
+        }
+
         if (coll.relativeVelocity.y > minFallDamageSpeed)
         {
             damage = (coll.relativeVelocity.y * fallDamageMultiplier)/100;

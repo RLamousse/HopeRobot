@@ -26,9 +26,7 @@ public class ModifyGravity : MonoBehaviour
     }
     void Update()
     {
-        
-        //CheckFall();
-
+    
         if(Input.GetKeyDown(KeyCode.LeftShift)) SwapGravity();
 
         bool reduction = false;
@@ -42,21 +40,17 @@ public class ModifyGravity : MonoBehaviour
         baseGravity *= -1;
         gameObject.GetComponent<RobotController>().InvertGravity();
         Vector3 swap = new Vector3(0, 0, 180);
-        if (baseGravity > 0 && !_UpsideDown)
+        if (baseGravity > 0 && !_UpsideDown && _Anim.GetComponent<RobotController>()._Grounded)
         {
             _UpsideDown = true;
             transform.position += Vector3.up;
             transform.Rotate(swap);
-            //_MainCamera.transform.Rotate(-swap);
-            //_MainCamera.transform.localPosition = new Vector3(0, 0.2f, -1);
         }
         else if (baseGravity < 0 && _UpsideDown)
         {
             _UpsideDown = false;
             transform.position += Vector3.down;
             transform.Rotate(-swap);
-            //_MainCamera.transform.Rotate(swap);
-            //_MainCamera.transform.localPosition = new Vector3(0, 0.2f, 1);
         }
     }
 

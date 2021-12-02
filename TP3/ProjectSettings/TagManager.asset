@@ -6,6 +6,7 @@ TagManager:
   tags:
   - StoneMonsterProjectile
   - Spaceship
+  - StoneMonster
   layers:
   - Default
   - TransparentFX
