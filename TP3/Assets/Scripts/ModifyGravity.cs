@@ -57,15 +57,32 @@ public class ModifyGravity : MonoBehaviour
 
     void GravityReduction(bool reduction)
     {
+        
         if (reduction)
         {
-            Vector3 gravity = baseGravity * gravityReduction * Vector3.up;
-            _Rb.AddForce(gravity, ForceMode.Acceleration);
+            if(_Rb.velocity.y<0)
+            {
+                Vector3 gravity = baseGravity*2 * gravityReduction * Vector3.up;
+                _Rb.AddForce(gravity, ForceMode.Acceleration);
+            }
+            else
+            {
+                Vector3 gravity = baseGravity * gravityReduction * Vector3.up;
+                _Rb.AddForce(gravity, ForceMode.Acceleration);
+            }
         }
         else
         {
-            Vector3 gravity = baseGravity * Vector3.up;
-            _Rb.AddForce(gravity, ForceMode.Acceleration);
+            if(_Rb.velocity.y<0)
+            {
+                Vector3 gravity = baseGravity*2* Vector3.up;
+                _Rb.AddForce(gravity, ForceMode.Acceleration);
+            }
+            else
+            {
+                Vector3 gravity = baseGravity * Vector3.up;
+                _Rb.AddForce(gravity, ForceMode.Acceleration);
+            }
         }
     }
 

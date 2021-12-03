@@ -12,7 +12,7 @@ public class HealthBar : MonoBehaviour
 
     // La vitesse minimale de la chute ou le robot commencera à perdre des points de vie
     [SerializeField]
-    float minFallDamageSpeed = 10f;
+    float minFallDamageSpeed = 5f;
     public Slider healthSlider;
 
     public static HealthBar instance;
@@ -47,7 +47,7 @@ public class HealthBar : MonoBehaviour
 
         if (coll.relativeVelocity.y > minFallDamageSpeed)
         {
-            damage = (coll.relativeVelocity.y * fallDamageMultiplier)/100;
+            damage = (coll.relativeVelocity.y * fallDamageMultiplier);
             // Debug.Log(coll.relativeVelocity.y);
             // Debug.Log(fallDamageMultiplier);
             // Debug.Log(damage);
