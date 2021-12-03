@@ -5,16 +5,13 @@ using UnityEngine;
 public class StoneMonster : MonoBehaviour
 {
 
-    [SerializeField] public float timeBeforeRespawn = 4f;
 
     void Start()
     {
-        GetComponent<Animation>().CrossFade ("Anim_Idle");
     }
 
     void OnTriggerEnter (Collider player) 
     {
-        
         if (player.CompareTag("Player")) {
             Pickup(player);
         }
@@ -23,16 +20,14 @@ public class StoneMonster : MonoBehaviour
     void Pickup (Collider player) 
     {
         RobotController playerControler =  player.GetComponent<RobotController>();
-
+        Debug.Log(playerControler.isSpeedBoosted);
+        Debug.Log(playerControler.isRolling);
         if(playerControler.isSpeedBoosted && playerControler.isRolling) {
-
-            // faire marcher cette animation
             GetComponent<Animation>().CrossFade ("Anim_Death");
-            
-            //gameObject.SetActive(false);
-            Debug.Log("ici");
+            Destroy(gameObject.transform.parent);
         } else {
             LevelManager.instance.respawn();
         }
     }
+    
 }

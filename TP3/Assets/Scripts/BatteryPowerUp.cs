@@ -17,7 +17,6 @@ public class BatteryPowerUp : MonoBehaviour
     {
         GameObject batteryObject = GameObject.Find("Battery");
         BatteryProgressBar batteryScript = batteryObject.GetComponent<BatteryProgressBar>();
-        //Debug.Log(battery);
         batteryScript.batteryValue = 1.0f;
 
         powerUpDisabled(true);

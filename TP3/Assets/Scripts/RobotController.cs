@@ -14,6 +14,8 @@ public class RobotController : MonoBehaviour
     public bool isSpeedBoosted = false;
     public bool isRolling = false;
     public bool isStandby = false;
+
+    
     public bool _Grounded { get; set; }
     bool _Flipped { get; set; }
     bool _UpsideDown { get; set; }
@@ -41,6 +43,9 @@ public class RobotController : MonoBehaviour
 
     [SerializeField]
     GameObject Shield;
+
+    [SerializeField]
+    public GameObject winText;
 
     public static RobotController instance;
 
@@ -252,6 +257,8 @@ public class RobotController : MonoBehaviour
         if(coll.gameObject.tag == "Spaceship")
         {
             Debug.Log("Game won");
+            winText.SetActive(true);
+            Time.timeScale = 0;
         }
         HealthBar.instance.ApplyDamage(coll);
         // On s'assure de bien �tre en contact avec le sol

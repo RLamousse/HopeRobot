@@ -14,10 +14,7 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("position initiale respawn point");
-        Debug.Log(lastCheckpoint);
         lastCheckpoint = respawnPoint.position;
-        
     }
 
     private void Awake() {
@@ -26,8 +23,6 @@ public class LevelManager : MonoBehaviour
     }
     
     public void respawn() {
-        Debug.Log("position mort");
-        Debug.Log(player.transform.position);
         nbLives -= 1;
         if(nbLives < 1) {
             restart();
@@ -57,18 +52,6 @@ public class LevelManager : MonoBehaviour
     }
 
     public void restart() {
-        // nbLives = nbInitialLives;
-        // //Health.instance.resetHearts();
-        // lastCheckpoint = respawnPoint.position;
-        // Instantiate(player, respawnPoint.position, Quaternion.identity);
-        // resetBattery();
-        // resetPowerUps();
-        // resetCheckpoints();
-        // resetHealthBar();
-        // Health.instance.ResetHearts();
-        // Timer.instance.EndTimer();
-        // Timer.instance.StartTimer();
-        // Timer.instance.isStandby = false;
         Scene scene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(scene.name);
     }

@@ -48,9 +48,9 @@ public class HealthBar : MonoBehaviour
         if (coll.relativeVelocity.y > minFallDamageSpeed)
         {
             damage = (coll.relativeVelocity.y * fallDamageMultiplier)/100;
-            Debug.Log(coll.relativeVelocity.y);
-            Debug.Log(fallDamageMultiplier);
-            Debug.Log(damage);
+            // Debug.Log(coll.relativeVelocity.y);
+            // Debug.Log(fallDamageMultiplier);
+            // Debug.Log(damage);
         }
 
         if (RobotController.instance.hasShield && damage > 0)

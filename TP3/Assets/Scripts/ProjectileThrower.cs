@@ -29,7 +29,7 @@ public class ProjectileThrower : MonoBehaviour
 
     public void ThrowProjectile(float force, float angle)
     {
-        GameObject monster = GameObject.Find("StoneMonster");
+        Transform monster = gameObject.transform.parent.GetChild(gameObject.transform.GetSiblingIndex() - 1);;
         monster.GetComponent<Animation>().CrossFade("Anim_Attack");
 
         float z = Mathf.Cos(angle * Mathf.PI / 180) * force;

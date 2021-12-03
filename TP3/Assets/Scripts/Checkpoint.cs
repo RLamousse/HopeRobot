@@ -27,7 +27,6 @@ public class Checkpoint : MonoBehaviour
     {
         if (player.CompareTag("Player")) {
             Pickup(player);
-            Debug.Log(gameObject.transform.position);
         }
     }
 
