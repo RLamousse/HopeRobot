@@ -46,9 +46,7 @@ public class BatteryProgressBar : MonoBehaviour
         }
         else 
         {
-            Destroy(robot);
             LevelManager.instance.respawn();
-            
             batterySlider.value = 1.0f;
             batteryValue = 1.0f;
         }

@@ -44,9 +44,6 @@ public class Timer : MonoBehaviour
 
             yield return null;
         }
-        //Timer is over 
-        GameObject robot = GameObject.Find("robotSphere");
-        Destroy(robot);
         LevelManager.instance.restart();
     }
 

@@ -7,9 +7,9 @@ public class RobotController : MonoBehaviour
 {
     // D�claration des constantes
     private static readonly Vector3 FlipRotation = new Vector3(0, 180, 0);
-    private static readonly Vector3 CameraPosition = new Vector3(0, 0, 0);
-    private static readonly Vector3 InverseCameraPosition = new Vector3(0, 0, 0);
-
+    private static readonly Vector3 CameraPosition = new Vector3(1.5f, 0.4f, 0.02f);
+    private static readonly Vector3 InverseCameraPosition = new Vector3(-1.5f, 0.4f, 0.02f);
+    private static readonly Vector3 CameraRotation = new Vector3(15, -90, 0);
     // D�claration des variables
     public bool isSpeedBoosted = false;
     public bool isRolling = false;
@@ -48,7 +48,6 @@ public class RobotController : MonoBehaviour
 
     public float smoothCameraTransitionSpeed = 0.125f;
     public Vector3 offset;
-    private float lastCameraYPosition = 0;
 
     // Awake se produit avait le Start. Il peut �tre bien de r�gler les r�f�rences dans cette section.
     void Awake()
@@ -66,8 +65,6 @@ public class RobotController : MonoBehaviour
     {
         _Grounded = false;
         _Flipped = false;
-        Speed = 50f;
-        baseSpeed = 50f;
     }
 
     // V�rifie les entr�es de commandes du joueur
@@ -91,29 +88,9 @@ public class RobotController : MonoBehaviour
 
     private void LateUpdate()
     {
-        UpdateCamera();
         CheckRolling();
     }
-
-    void UpdateCamera()
-    {
-        float damping = 0.250f;
-        Vector3 currentPosition = _MainCamera.transform.position;
-        Vector3 targetPosition = _Anim.transform.position + offset;
-        Vector3 smoothedPosition = Vector3.Lerp(_MainCamera.transform.position, targetPosition, damping);
-        if (!_Grounded && (Math.Abs(lastCameraYPosition - targetPosition.y) < 30) && !AnimatorIsPlaying("anim_open"))
-        {
-            smoothedPosition.y = lastCameraYPosition;
-        }
-        else
-        {
-        _MainCamera.transform.LookAt(_Anim.transform);
-
-        }
-            _MainCamera.transform.position = new Vector3(targetPosition.x, smoothedPosition.y, smoothedPosition.z);
-            lastCameraYPosition = _MainCamera.transform.position.y;
-    }
-
+    
     void CheckStandby() {
         if (Input.GetKeyDown(KeyCode.Tab) && Timer.instance != null) {
             isRolling = false;
@@ -136,7 +113,6 @@ public class RobotController : MonoBehaviour
 
     void CheckY() {
         if (gameObject.GetComponent<Transform>().position.y < -10) {
-            Destroy(gameObject);
             LevelManager.instance.respawn();
         }
     }
@@ -250,29 +226,28 @@ public class RobotController : MonoBehaviour
         baseGravity *= -1;
     }
 
-    
+
     // G�re l'orientation du joueur et les ajustements de la camera
-    void FlipCharacter(int direction)
+    public void FlipCharacter(int direction)
     {
-        float initialYRotation = _MainCamera.transform.rotation.y;
         if (direction < 0 && !_Flipped)
         {
             _Flipped = true;
             transform.Rotate(FlipRotation);
-            _MainCamera.transform.Rotate(-FlipRotation);
+            _MainCamera.transform.rotation = Quaternion.Euler(CameraRotation);
             _MainCamera.transform.localPosition = InverseCameraPosition;
         }
         else if (direction > 0 && _Flipped)
         {
             _Flipped = false;
             transform.Rotate(-FlipRotation);
-            _MainCamera.transform.Rotate(FlipRotation);
+            _MainCamera.transform.rotation = Quaternion.Euler(CameraRotation);
             _MainCamera.transform.localPosition = CameraPosition;
         }
     }
-   
-// Collision avec le sol
-void OnCollisionEnter(Collision coll)
+
+    // Collision avec le sol
+    void OnCollisionEnter(Collision coll)
     {
         if(coll.gameObject.tag == "Spaceship")
         {
@@ -290,8 +265,15 @@ void OnCollisionEnter(Collision coll)
         //}
     }
 
-    //
-
-
-
+    public void reset() {
+        _Anim.SetBool("Roll_Anim", false);
+        isSpeedBoosted = false;
+        isRolling = false;
+        isStandby = false;
+        _Grounded = false;
+        Speed = 0f;
+        if(_Flipped) {
+            FlipCharacter(1);
+        }
+    }
 }

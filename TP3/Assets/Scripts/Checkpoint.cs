@@ -7,7 +7,6 @@ public class Checkpoint : MonoBehaviour
     
     public GameObject pickupEffect;
     private float animationDelay = 3f;
-    public Transform correspondingSpawn;
 
     public LevelManager levelManager;
 
@@ -28,14 +27,13 @@ public class Checkpoint : MonoBehaviour
     {
         if (player.CompareTag("Player")) {
             Pickup(player);
+            Debug.Log(gameObject.transform.position);
         }
     }
 
     void Pickup (Collider player) 
     {
-        //GameObject LevelManager = GameObject.Find("LevelManager");
-        //Component LevelManager = LevelManagerObject.GetComponent<LevelManager>();
-        levelManager.lastCheckpoint = correspondingSpawn.position;
+        levelManager.lastCheckpoint = gameObject.transform.position;
 
         gameObject.SetActive(false);
         enableNoPowerUpAnimation();

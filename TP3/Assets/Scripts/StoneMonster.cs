@@ -32,8 +32,6 @@ public class StoneMonster : MonoBehaviour
             //gameObject.SetActive(false);
             Debug.Log("ici");
         } else {
-            GameObject robot = GameObject.Find("robotSphere");
-            Destroy(robot);
             LevelManager.instance.respawn();
         }
     }

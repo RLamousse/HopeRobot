@@ -1,12 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
     public Transform respawnPoint;
-    public Transform checkpoint1;
-    public Transform checkpoint2;
     public GameObject player;
     public static LevelManager instance; 
     public int nbLives;
@@ -15,6 +14,8 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("position initiale respawn point");
+        Debug.Log(lastCheckpoint);
         lastCheckpoint = respawnPoint.position;
         
     }
@@ -25,38 +26,51 @@ public class LevelManager : MonoBehaviour
     }
     
     public void respawn() {
+        Debug.Log("position mort");
+        Debug.Log(player.transform.position);
         nbLives -= 1;
-        kill();
         if(nbLives < 1) {
             restart();
         } else {
-            Health.instance.LoseHeart(1, nbLives);
-            Instantiate(player, lastCheckpoint, Quaternion.identity);
-            resetBattery();
-            resetHealthBar();
-            resetPowerUps();
+            respawnLastCheckpoint();
         }
     }
 
+    void respawnLastCheckpoint () 
+    {
+        GameObject robot = GameObject.Find("robotSphere");
+        robot.transform.position = lastCheckpoint;
+        RobotController.instance.reset();
+        Health.instance.LoseHeart(1, nbLives);
+        resetBattery();
+        resetHealthBar();
+        resetPowerUps();
+    }
 
-    void kill() {
-        Destroy(GameObject.Find("Character"));
-        Destroy(GameObject.Find("Character(Clone)"));
+
+    private void pauseGame() {
+        Time.timeScale = 0;
+    }
+
+    private void resumeGame() {
+        Time.timeScale = 1;
     }
 
     public void restart() {
-        nbLives = nbInitialLives;
-        //Health.instance.resetHearts();
-        lastCheckpoint = respawnPoint.position;
-        Instantiate(player, respawnPoint.position, Quaternion.identity);
-        resetBattery();
-        resetPowerUps();
-        resetCheckpoints();
-        resetHealthBar();
-        Health.instance.ResetHearts();
-        Timer.instance.EndTimer();
-        Timer.instance.StartTimer();
-        Timer.instance.isStandby = false;
+        // nbLives = nbInitialLives;
+        // //Health.instance.resetHearts();
+        // lastCheckpoint = respawnPoint.position;
+        // Instantiate(player, respawnPoint.position, Quaternion.identity);
+        // resetBattery();
+        // resetPowerUps();
+        // resetCheckpoints();
+        // resetHealthBar();
+        // Health.instance.ResetHearts();
+        // Timer.instance.EndTimer();
+        // Timer.instance.StartTimer();
+        // Timer.instance.isStandby = false;
+        Scene scene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(scene.name);
     }
     
     List<GameObject> GetAllChilds(GameObject Go) {
